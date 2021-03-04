@@ -1,12 +1,7 @@
 const path = require("path");
 const express = require("express");
-//const hbs = require("hbs");
-//const { registerHelper } = require("hbs");
 const port = process.env.PORT || 3000;
 const app = express();
-//const xlsx = require("xlsx");
-//const Mongo = require("mongodb");
-
 require("dotenv").config();
 
 app.get("/JSON/nativePlants", (req, res) => {
@@ -41,17 +36,6 @@ app.get("/JSON/nativePlants", (req, res) => {
     });
   });
 
-  // client.connect(connectionURL, { useNewUrlParser: true }, (error, client) => {
-  //   //assert.equal(null, err);
-  //   if (error) {
-  //     return console.log(error);
-  //   } else {
-  //     const db = client.db(databaseName);
-  //     const collection = db.collection("Plants");
-  //
-  //   }
-  // });
-  //   .find({})
 });
 
 app.listen(port, () => {

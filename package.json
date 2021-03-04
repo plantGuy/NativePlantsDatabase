@@ -1,12 +1,13 @@
 {
-  "name": "taskmanager",
+  "name": "NativePlants",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Native Plants API",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "app.js",
+    "dev": "app.js -e js,hbs"
   },
-  "author": "",
+  "author": "Lonnie Murray",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
