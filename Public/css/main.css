@@ -1,11 +1,23 @@
 #searchPanel {
+  border: 50 px;
   background-color: lightblue;
+  padding: 50px;
 }
 
 #results {
+  padding: 50px;
+  border: 50px;
   background-color: lightgreen;
+}
+
+Div {
+  float: none;
+  display: block;
+  clear: both;
+  margin: 10px;
 }
 
 .resultLabel {
   float: left;
+  font-weight: bold;
 }

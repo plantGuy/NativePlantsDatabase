@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Remedy Asset Tool</title>
+  <head>
+    <title>Example search page</title>
     <script
       type="text/javascript"
-      src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"
+    ></script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <script type="text/javascript" src="js/main.js"></script>
     <link rel="stylesheet" type="text/css" href="css/main.css" />
   </head>
 
+  <div id="searchPanel">
+    <label for="ScientificName">Name</label>
+    <input type="text" id="ScientificName" name="ScientificName" />
+    <button id="search" onclick="getPlants()">Search</button>
+  </div>
 
-<div ID='searchPanel'>
-
-    <label for='ScientificName'>Name</label>
-    <input type="text" ID="ScientificName" Name="ScientificName">
-    <Button ID="search" onclick="getPlants()">Search</Button>
-
-</div>
-
-<div id='results'>
-    <Div class='resultLabel'>Name</Div><div ID='strCommonName'></div>
-    <Div class='resultLabel'></Div>>Native To</Div><Div ID='flgNativeTo'></Div>
-    <Div class='resultLabel'></Div>>Special Uses</Div><Div ID='strSpecialUses'></Div>
-    <Div class='resultLabel'></Div>>Planting Recommendations</Div> <Div ID='strPlantingRecommendations'></Div>
-    <Div class='resultLabel'></Div>>Growth Patterns</Div><Div ID='strGrowthPatterns'></Div> 
-
-</div>
+  <div id="results">
+    <div class="resultLabel">Name</div>
+    <div id="strCommonName"></div>
+    <div class="resultLabel">Native To</div>
+    <div id="flgNativeTo"></div>
+    <div class="resultLabel">Special Uses</div>
+    <div id="strSpecialUses"></div>
+    <div class="resultLabel">Planting Recommendations</div>
+    <div id="strPlantingRecommendations"></div>
+    <div class="resultLabel">Growth Patterns</div>
+    <div id="strGrowthPatterns"></div>
+  </div>
 </html>
