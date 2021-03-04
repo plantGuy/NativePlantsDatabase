@@ -2,10 +2,10 @@
   "name": "NativePlants",
   "version": "1.0.0",
   "description": "Native Plants API",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "app.js",
-    "dev": "app.js -e js,hbs"
+    "start": "node src/app.js",
+    "dev": "node src/app.js -e js,hbs"
   },
   "author": "Lonnie Murray",
   "license": "ISC",
