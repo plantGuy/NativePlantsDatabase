@@ -4,6 +4,8 @@ const port = process.env.PORT || 3000;
 const app = express();
 require("dotenv").config();
 
+app.use(express.static(path.join(__dirname, "../public")));
+
 app.get("/", (req, res) => {
   res.send("Welcome to the Native Plants API");
 });

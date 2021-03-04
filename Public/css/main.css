@@ -1,0 +1,11 @@
+#searchPanel {
+  background-color: lightblue;
+}
+
+#results {
+  background-color: lightgreen;
+}
+
+.resultLabel {
+  float: left;
+}
