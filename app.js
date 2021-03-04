@@ -4,6 +4,10 @@ const port = process.env.PORT || 3000;
 const app = express();
 require("dotenv").config();
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Native Plants API");
+});
+
 app.get("/JSON/nativePlants", (req, res) => {
   //var search = JSON.parse(req.query.search);
   var search = JSON.parse(req.query.search);
@@ -35,7 +39,6 @@ app.get("/JSON/nativePlants", (req, res) => {
       client.close();
     });
   });
-
 });
 
 app.listen(port, () => {
