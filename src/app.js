@@ -47,13 +47,17 @@ app.get("/JSON/nativePlants", (req, res) => {
   }
 });
 
+function getfieldValues(field, fieldID) {
+  console.log("future use");
+}
+
 app.get("/JSON/fieldValues", (req, res) => {
   //var search = JSON.parse(req.query.search);
   try {
-    const field = req.query.field;
-    const fieldID = req.query.fieldID;
+    var field = req.query.field;
+    var fieldID = req.query.fieldID;
 
-    search = { fieldName: field, ValueID: fieldID.trimEnd() };
+    var search = { fieldName: field, ValueID: fieldID };
 
     uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
     databaseName = process.env.MongoDB;
@@ -74,6 +78,8 @@ app.get("/JSON/fieldValues", (req, res) => {
         if (results) {
           console.log(results);
           res.send(results);
+        } else {
+          res.send({ Value: fieldID, ValueID: fieldID, fieldName: field });
         }
         client.close();
       });
