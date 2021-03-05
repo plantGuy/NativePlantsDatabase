@@ -53,7 +53,7 @@ app.get("/JSON/fieldValues", (req, res) => {
     const field = req.query.field;
     const fieldID = req.query.fieldID;
 
-    query = { fieldName: field, ValueID: fieldID };
+    search = { fieldName: field, ValueID: fieldID.trimEnd() };
 
     uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
     databaseName = process.env.MongoDB;
@@ -69,8 +69,10 @@ app.get("/JSON/fieldValues", (req, res) => {
         .db(process.env.MongoDB)
         .collection("FieldValues");
       // perform actions on the collection object
+      console.log(search);
       collection.find(search).toArray((err, results) => {
         if (results) {
+          console.log(results);
           res.send(results);
         }
         client.close();
