@@ -47,6 +47,40 @@ app.get("/JSON/nativePlants", (req, res) => {
   }
 });
 
+app.get("/JSON/fieldValues", (req, res) => {
+  //var search = JSON.parse(req.query.search);
+  try {
+    const field = req.query.field;
+    const fieldID = req.query.fieldID;
+
+    query = { fieldName: field, ValueID: fieldID };
+
+    uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
+    databaseName = process.env.MongoDB;
+
+    const MongoClient = require("mongodb").MongoClient;
+    //const uri = "mongodb+srv://PlantsAdmin:<password>@cluster0.vikvy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    client.connect((err) => {
+      const collection = client
+        .db(process.env.MongoDB)
+        .collection("FieldValues");
+      // perform actions on the collection object
+      collection.find(search).toArray((err, results) => {
+        if (results) {
+          res.send(results);
+        }
+        client.close();
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.listen(port, () => {
   console.log(`server started on port ${port}`);
 });
