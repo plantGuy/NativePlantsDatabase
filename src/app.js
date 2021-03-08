@@ -15,9 +15,11 @@ app.get("/JSON/nativePlants", (req, res) => {
   try {
     var search = JSON.parse(req.query.search);
     Object.keys(search).forEach((element) => {
-      if (search[element].match(/.*\.*/)) {
+      if (req.query.partial) {
+        //match(/.*\.*/)) {
         console.log("like search detected");
-        //search[element] = { $regex: search[element], $options: "i" };
+        searchElement = "." + element + ".";
+        search[element] = { $regex: search[searchElement], $options: "i" };
       }
     });
     console.log(search);
