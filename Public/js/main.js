@@ -1,18 +1,19 @@
 function getPlants() {
+  $(".field").empty();
   getData((data) => {
     console.log(data);
     fields = $(".field");
     for (i = 0; i < fields.length; i++) {
       let field = $(fields[i]).attr("ID");
       if (data[field]) {
-        let values = data[field];
+        let values = data[field].Values;
         console.log(values);
         if (values) {
           if (Array.isArray(values)) {
             $("#" + field).append(`<UL ID="list${field}">`);
-            parseValues(values, field).then((newValues) => {
-              makeList(newValues, field);
-            });
+            //parseValues(values, field).then((newValues) => {
+            makeList(values, field);
+            //});
           } else {
             let result = `<P>${values}</p>`;
             $("#" + field).html(result);
@@ -59,12 +60,13 @@ function getData(next) {
     dataType: "JSON",
     data: {
       search: JSON.stringify({ strSciName }),
+      partial: true,
     },
     error: function (error) {
       console.log(error);
     },
     success: function (data) {
-      return next(data[0]);
+      return next(data);
     },
   });
 }
@@ -102,11 +104,11 @@ function makeList(valList, field, next) {
     var x = 1;
     valList.forEach((fldValue) => {
       console.log(fldValue);
-      result = result + `<li>${fldValue}</li>`;
+      result = result + `<li>${fldValue.Value}</li>`;
       console.log(result);
       x = x + 1;
       if (x == valList.length + 1) {
-        //$("#" + field + " UL").html(result);
+        $("#" + field + " UL").html(result);
         resolve(result);
       }
     });
