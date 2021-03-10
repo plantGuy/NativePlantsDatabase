@@ -55,7 +55,7 @@ app.get("/JSON/nativePlants", (req, res) => {
             res.send(newResults);
           });
         }
-        //client.close();
+        client.close();
       });
     });
   } catch (error) {
@@ -75,13 +75,12 @@ function parseValues(values, field, next) {
     values.forEach((value) => {
       promises.push(
         new Promise((resolve, reject) => {
-          var search = { fieldName: field, ValueID: value };
+          var search = { fieldName: field, ValueID: value.trim() };
           collection.find(search).toArray((err, results) => {
             if (err) {
               reject(err);
             } else {
               if (results.length > 0) {
-                console.log(results);
                 tmpValues.push({
                   Value: results[0].Value,
                   ValueID: results[0].ValueID,
@@ -143,6 +142,76 @@ function getFieldValues(results, next) {
   });
 }
 
+app.get("/JSON/parseFields", (req, res) => {
+  //var search = JSON.parse(req.query.search);
+  try {
+    var parsedFields = [];
+
+    //uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
+    databaseName = process.env.MongoDB;
+
+    //const uri = "mongodb+srv://PlantsAdmin:<password>@cluster0.vikvy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    client.connect((err) => {
+      const collection = client
+        .db(process.env.MongoDB)
+        .collection("FieldValues");
+      // perform actions on the collection object
+
+      collection.find({}).toArray((err, results) => {
+        if (results) {
+          results.forEach((field) => {
+            if (!parsedFields[field.fieldName]) {
+              parsedFields.push(field.fieldName);
+              parsedFields[field.fieldName].values = [];
+            }
+            parsedFields[field.fieldName].values.push({
+              Value: field.Value.replace(/\s/g, ""),
+              ValueID: field.ValueID.replace(/\s/g, ""),
+            });
+          });
+
+          res.send(parsedFields);
+        }
+        //client.close();
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/JSON/fields", (req, res) => {
+  //var search = JSON.parse(req.query.search);
+  try {
+    //uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
+    databaseName = process.env.MongoDB;
+
+    //const uri = "mongodb+srv://PlantsAdmin:<password>@cluster0.vikvy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    client.connect((err) => {
+      const collection = client.db(process.env.MongoDB).collection("Fields");
+      // perform actions on the collection object
+
+      collection.find({}).toArray((err, results) => {
+        if (results) {
+          res.send(results);
+          client.close();
+        }
+      });
+      //client.close();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.get("/JSON/fieldValues", (req, res) => {
   //var search = JSON.parse(req.query.search);
   try {
@@ -167,10 +236,7 @@ app.get("/JSON/fieldValues", (req, res) => {
       console.log(search);
       collection.find(search).toArray((err, results) => {
         if (results) {
-          results[0].forEach((field) => {
-            console.log(field);
-          });
-          console.log(results);
+          results[0].forEach((field) => {});
           res.send(results);
         } else {
           res.send({ Value: fieldID, ValueID: fieldID, fieldName: field });

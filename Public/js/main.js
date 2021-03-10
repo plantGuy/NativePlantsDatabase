@@ -1,22 +1,30 @@
+$(document).ready(() => {
+  main();
+});
+
+function main() {
+  getFields("results", false);
+  getFields("searchPanel", true);
+}
+
 function getPlants() {
   $(".field").empty();
   getData((data) => {
     console.log(data);
-    fields = $(".field");
+    fields = $(".field"); //get the list of fields on the form
     for (i = 0; i < fields.length; i++) {
-      let field = $(fields[i]).attr("ID");
+      let field = $(fields[i]).attr("ID").replaceAll("result", ""); //get the ID of the current field
+
       if (data[field]) {
-        let values = data[field].Values;
+        let values = data[field].Values; //retrieve field values
         console.log(values);
         if (values) {
           if (Array.isArray(values)) {
-            $("#" + field).append(`<UL ID="list${field}">`);
-            //parseValues(values, field).then((newValues) => {
-            makeList(values, field);
-            //});
+            $("#result" + field).append(`<UL ID="list${field}">`);
+            makeList(values, field); // If multple values format as list
           } else {
-            let result = `<P>${values}</p>`;
-            $("#" + field).html(result);
+            let result = `<P>${values}</p>`; //If only one value display
+            $("#result" + field).html(result);
           }
         }
       }
@@ -24,34 +32,69 @@ function getPlants() {
   });
 }
 
-function parseValues(valueList, fieldName, next) {
-  newValues = [];
-  var y = 1;
-  return new Promise((resolve, reject) => {
-    for (x = 0; x < valueList.length; x++) {
-      var fieldID = valueList[x];
-      console.log(fieldID);
-      $("#" + fieldName + " UL").append(
-        `<li ID="li${fieldID.replace(/\s/g, "")}"></li>`
-      );
-      getFieldValue(fieldName, fieldID, (newValue) => {
-        if (newValue) {
-          newValues[x] = newValue;
+function getFields(target, input = false) {
+  $.ajax({
+    //http://localhost:3000/JSON/nativePlants?search={%22Species%22:%22Asclepias%22}
+    url: "/JSON/fields",
+    type: "GET",
+    dataType: "JSON",
+    data: {},
+    error: function (error) {
+      console.log(error);
+    },
+    success: function (data) {
+      data.forEach((field) => {
+        //Add each field to the target div
+        if (input == true) {
+          if (field.values) {
+            $("#" + target).append(`
+          <div class='srchFieldDiv'>
+          <label for='${field.dbName}'>${field.fieldName}</label>
+          <select ID='${field.dbName}' Name='${field.dbName}'  class='srchField' >
+          </Div>`);
+            $("#" + field.dbName).append('<option value="" selected></option>');
+            field.values.forEach((value) => {
+              //populate select options
+              console.log(value);
+              console.log(field.dbName);
+              $("#" + field.dbName).append(
+                `<option value='${value.ValueID}'>${value.Value}</Option>`
+              );
+            });
+          } else {
+            $("#" + target).append(
+              $("#searchPanel").append(`
+          <div class='srchFieldDiv'>
+          <label for='${field.dbName}'>${field.fieldName}</label>
+          <input ID='${field.dbName}' class='srchField' Name='${field.dbName}'>
+          </Div>`)
+            );
+          }
         } else {
-          $(`#li${fieldID}`).html(fieldID);
-        }
-        y++;
-        if (y == valueList.length + 1) {
-          resolve(newValues);
+          $("#" + target).append(
+            `<div style='width:auto;float:left;'>
+                <div class="resultLabel">${field.fieldName}</div>
+                <div id="result${field.dbName}" class="field"></div>
+              </div>
+          `
+          );
         }
       });
-    }
+    },
   });
 }
 
 function getData(next) {
-  var name = $(ScientificName).val();
-  var strSciName = name;
+  var search = {};
+
+  var inputs = document.getElementsByClassName("srchField");
+
+  Array.prototype.forEach.call(inputs, (fld) => {
+    if (fld.value) {
+      search[fld.id] = fld.value;
+    }
+  });
+  console.log(search);
 
   $.ajax({
     //http://localhost:3000/JSON/nativePlants?search={%22Species%22:%22Asclepias%22}
@@ -59,7 +102,7 @@ function getData(next) {
     type: "GET",
     dataType: "JSON",
     data: {
-      search: JSON.stringify({ strSciName }),
+      search: JSON.stringify(search),
       partial: true,
     },
     error: function (error) {
@@ -72,8 +115,6 @@ function getData(next) {
 }
 
 function getFieldValue(field, fldID, next) {
-  console.log(fldID);
-
   $.ajax({
     //http://localhost:3000/JSON/nativePlants?search={%22Species%22:%22Asclepias%22}
     url: "/JSON/fieldValues",
@@ -104,11 +145,10 @@ function makeList(valList, field, next) {
     var x = 1;
     valList.forEach((fldValue) => {
       console.log(fldValue);
-      result = result + `<li>${fldValue.Value}</li>`;
-      console.log(result);
+      result = result + `<li>${fldValue.Value}</li>`; //builds a list of values
       x = x + 1;
       if (x == valList.length + 1) {
-        $("#" + field + " UL").html(result);
+        $("#result" + field + " UL").html(result); //if the last item then return. Could rewrite with Promise.all
         resolve(result);
       }
     });

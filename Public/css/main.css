@@ -8,16 +8,18 @@
   padding: 50px;
   border: 50px;
   background-color: lightgreen;
+  width: auto;
+  overflow: auto;
 }
 
 Div {
-  float: none;
+  float: left;
   display: block;
-  clear: both;
   margin: 10px;
 }
 
 .resultLabel {
   float: left;
   font-weight: bold;
+  width: fit-content;
 }
