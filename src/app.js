@@ -15,9 +15,10 @@ app.get("/", (req, res) => {
   res.send(`<H1>Welcome to the Native Plants API</H1>
   <H3>Directions for Use</H3>
   <P><b>/JSON/nativePlants?</B> - Retrieves a list of native plants and accepts a search using plant attributes using a JSON match</P>
-  <P><B>Example<B>:  search={"strSciName":"Acer"}&partial=true</p>
+  <P><B>Example</B>:  search={"strSciName":"Acer"}&partial=true</p>
   <P>Use "Partial" to indicate you want a partial match</P>
   <P><B>/JSON/fieldValues?</B> - returns the human name of the field values using the query params field and fieldID</P>
+  <P><B>/JSON/fields?</B> - returns the fields currently defined and their values</P>
   `);
 });
 
