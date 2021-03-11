@@ -110,38 +110,44 @@ function parseValues(values, field, next) {
 function getFieldValues(results, next) {
   var parsedFields = {};
   var promises = [];
-  const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  try {
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-  // perform actions on the collection object
-  Object.keys(results).forEach((field) => {
-    parsedFields[field] = {};
-    parsedFields[field].Values = [];
-    if (Array.isArray(results[field])) {
-      promises.push(
-        new Promise(async (resolve, reject) => {
-          parseValues(results[field], field, (values) => {
-            parsedFields[field].Values = values;
-            //tmpField.values = values;
-            resolve();
-          });
-        })
-      );
-    } else {
-      promises.push(
-        new Promise((resolve, reject) => {
-          parsedFields[field].Values = results[field];
-          resolve();
-        })
-      );
-    } //is array loop end
-  });
-  Promise.all(promises).then(() => {
-    console.log("done parsing fields");
-    return next(parsedFields);
-  });
+    if (results) {
+      // perform actions on the collection object
+      Object.keys(results).forEach((field) => {
+        parsedFields[field] = {};
+        parsedFields[field].Values = [];
+        if (Array.isArray(results[field])) {
+          promises.push(
+            new Promise(async (resolve, reject) => {
+              parseValues(results[field], field, (values) => {
+                parsedFields[field].Values = values;
+                //tmpField.values = values;
+                resolve();
+              });
+            })
+          );
+        } else {
+          promises.push(
+            new Promise((resolve, reject) => {
+              parsedFields[field].Values = results[field];
+              resolve();
+            })
+          );
+        } //is array loop end
+      });
+      Promise.all(promises).then(() => {
+        console.log("done parsing fields");
+        return next(parsedFields);
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 app.get("/JSON/parseFields", (req, res) => {
@@ -177,6 +183,8 @@ app.get("/JSON/parseFields", (req, res) => {
           });
           client.close();
           res.send(parsedFields);
+        } else {
+          res.send({});
         }
         //client.close();
       });

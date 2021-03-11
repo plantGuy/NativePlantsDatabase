@@ -70,7 +70,7 @@ function getPlants() {
           if (values) {
             $("#result" + field).append(`<UL ID="list${field}">`);
             makeList(values, field);
-            normalize(values, field, data[ID]); //This ia placeholder to clean up the data
+            //normalize(values, field, data[ID]); //This ia placeholder to clean up the data
           }
         }
       }
