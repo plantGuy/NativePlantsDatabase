@@ -24,6 +24,11 @@ Div {
   width: fit-content;
 }
 
+button {
+  font-size: large;
+  padding: 8px;
+}
+
 #divSubmit {
   clear: both;
   display: block;
