@@ -8,6 +8,7 @@ databaseName = process.env.MongoDB;
 const MongoClient = require("mongodb").MongoClient;
 const { promises } = require("fs");
 const { profileEnd } = require("console");
+const e = require("express");
 
 app.use(express.static(path.join(__dirname, "../Public")));
 
@@ -71,12 +72,21 @@ function parseValues(values, field, next) {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
+  if (!Array.isArray(values)) {
+    // if not an array then convert it to one.
+    tmpArray = [];
+    tmpArray.push(values);
+    values = tmpArray;
+  }
   client.connect((err) => {
     const collection = client.db(process.env.MongoDB).collection("FieldValues");
     values.forEach((value) => {
+      if (!Number.isInteger) {
+        value = value.trim();
+      }
       promises.push(
         new Promise((resolve, reject) => {
-          var search = { fieldName: field, ValueID: value.trim() };
+          var search = { fieldName: field, ValueID: value };
           collection.find(search).toArray((err, results) => {
             if (err) {
               reject(err);
@@ -121,7 +131,13 @@ function getFieldValues(results, next) {
       Object.keys(results).forEach((field) => {
         parsedFields[field] = {};
         parsedFields[field].Values = [];
-        if (Array.isArray(results[field])) {
+        if (
+          Array.isArray(results[field]) ||
+          (results[field].length < 3 &&
+            results[field] != "Y" &&
+            results[field].trim().length > 0) ||
+          (Number.isInteger(results[field]) && results[field] < 100)
+        ) {
           promises.push(
             new Promise(async (resolve, reject) => {
               parseValues(results[field], field, (values) => {
@@ -153,7 +169,7 @@ function getFieldValues(results, next) {
 app.get("/JSON/parseFields", (req, res) => {
   //var search = JSON.parse(req.query.search);
   try {
-    var parsedFields = [];
+    var parsedFields = {};
 
     //uri = `mongodb+srv://PlantsAdmin:${process.env.MongoDBPW}@cluster0.vikvy.mongodb.net/${process.env.MongoDB}?retryWrites=true&w=majority`;
     databaseName = process.env.MongoDB;
@@ -173,12 +189,17 @@ app.get("/JSON/parseFields", (req, res) => {
         if (results) {
           results.forEach((field) => {
             if (!parsedFields[field.fieldName]) {
-              parsedFields.push(field.fieldName);
+              //parsedFields.push(field.fieldName);
+              parsedFields[field.fieldName] = {};
               parsedFields[field.fieldName].values = [];
             }
+            if (isNaN(field.ValueID)) {
+              field.ValueID = field.ValueID.replace(/\s/g, "");
+            }
+
             parsedFields[field.fieldName].values.push({
-              Value: field.Value.replace(/\s/g, ""),
-              ValueID: field.ValueID.replace(/\s/g, ""),
+              Value: field.Value,
+              ValueID: field.ValueID,
             });
           });
           client.close();

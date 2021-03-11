@@ -91,6 +91,7 @@ function displauFields(target, fieldlist, input = false) {
         $("#" + field.dbName).append('<option value="" selected></option>');
         field.values.forEach((value) => {
           //populate select options
+
           $("#" + field.dbName).append(
             `<option value='${value.ValueID}'>${value.Value}</Option>`
           );
@@ -139,7 +140,11 @@ function getData(next) {
 
   Array.prototype.forEach.call(inputs, (fld) => {
     if (fld.value) {
-      search[fld.id] = fld.value;
+      if (isNaN(fld.value)) {
+        search[fld.id] = fld.value;
+      } else {
+        search[fld.id] = parseInt(fld.value);
+      }
     }
   });
   console.log(search);
@@ -151,7 +156,7 @@ function getData(next) {
     dataType: "JSON",
     data: {
       search: JSON.stringify(search),
-      partial: true,
+      //partial: true,
     },
     error: function (error) {
       console.log(error);
