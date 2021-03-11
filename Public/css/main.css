@@ -23,3 +23,13 @@ Div {
   font-weight: bold;
   width: fit-content;
 }
+
+#divSubmit {
+  clear: both;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  width: 95%;
+  height: 30px;
+}

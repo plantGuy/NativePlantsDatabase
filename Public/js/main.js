@@ -1,23 +1,50 @@
+var formFields = {};
+
 $(document).ready(() => {
   main();
 });
 
 function main() {
-  getFields("results", false);
-  getFields("searchPanel", true);
+  getFields((fields) => {
+    formFields = fields;
+    displauFields("results", fields, false);
+    displauFields("searchPanel", fields, true);
+  });
+  //displauFields(target, fieldlist, input = false)
+}
+
+function normalize(valueList, field, RecID) {
+  console.log("insert function to normalize data here");
+}
+
+function getrelatedFields(fieldName) {
+  //some data was spread over many fields, this finds the related data
+  var matches = formFields.find((field) => {
+    if (field.dbName == fieldName) {
+      if (field.values[0].relatedField) {
+        return field.values;
+      }
+    }
+  });
+  if (matches) {
+    return matches.values.map((value) => {
+      return value;
+    });
+  }
 }
 
 function getPlants() {
   $(".field").empty();
   getData((data) => {
     console.log(data);
+
     fields = $(".field"); //get the list of fields on the form
     for (i = 0; i < fields.length; i++) {
       let field = $(fields[i]).attr("ID").replaceAll("result", ""); //get the ID of the current field
 
       if (data[field]) {
         let values = data[field].Values; //retrieve field values
-        console.log(values);
+        //console.log(values);
         if (values) {
           if (Array.isArray(values)) {
             $("#result" + field).append(`<UL ID="list${field}">`);
@@ -27,12 +54,69 @@ function getPlants() {
             $("#result" + field).html(result);
           }
         }
+      } else {
+        //some data was spread over many fields in a wacky way... This puts it back into a normal structure
+        var relatedFields = getrelatedFields(field);
+        if (relatedFields) {
+          var values = relatedFields.filter((related) => {
+            if (data[related.relatedField]) {
+              console.log(data[related.relatedField]);
+              if (data[related.relatedField].Values.toUpperCase() == "Y") {
+                return related;
+              }
+            }
+          });
+
+          if (values) {
+            $("#result" + field).append(`<UL ID="list${field}">`);
+            makeList(values, field);
+            normalize(values, field, data[ID]); //This ia placeholder to clean up the data
+          }
+        }
       }
     }
   });
 }
 
-function getFields(target, input = false) {
+function displauFields(target, fieldlist, input = false) {
+  fieldlist.forEach((field) => {
+    //Add each field to the target div
+    if (input == true) {
+      if (field.values) {
+        $("#" + target).append(`
+      <div class='srchFieldDiv'>
+      <label for='${field.dbName}'>${field.fieldName}</label>
+      <select ID='${field.dbName}' Name='${field.dbName}'  class='srchField' >
+      </Div>`);
+        $("#" + field.dbName).append('<option value="" selected></option>');
+        field.values.forEach((value) => {
+          //populate select options
+          $("#" + field.dbName).append(
+            `<option value='${value.ValueID}'>${value.Value}</Option>`
+          );
+        });
+      } else {
+        $("#" + target).append(
+          $("#searchPanel").append(`
+      <div class='srchFieldDiv'>
+      <label for='${field.dbName}'>${field.fieldName}</label>
+      <input ID='${field.dbName}' class='srchField' Name='${field.dbName}'>
+      </Div>`)
+        );
+      }
+    } else {
+      $("#" + target).append(
+        `<div style='width:auto;float:left;'>
+            <div class="resultLabel">${field.fieldName}</div>
+            <div id="result${field.dbName}" class="field"></div>
+          </div>
+      `
+      );
+    }
+  });
+}
+
+function getFields(next) {
   $.ajax({
     //http://localhost:3000/JSON/nativePlants?search={%22Species%22:%22Asclepias%22}
     url: "/JSON/fields",
@@ -43,43 +127,7 @@ function getFields(target, input = false) {
       console.log(error);
     },
     success: function (data) {
-      data.forEach((field) => {
-        //Add each field to the target div
-        if (input == true) {
-          if (field.values) {
-            $("#" + target).append(`
-          <div class='srchFieldDiv'>
-          <label for='${field.dbName}'>${field.fieldName}</label>
-          <select ID='${field.dbName}' Name='${field.dbName}'  class='srchField' >
-          </Div>`);
-            $("#" + field.dbName).append('<option value="" selected></option>');
-            field.values.forEach((value) => {
-              //populate select options
-              console.log(value);
-              console.log(field.dbName);
-              $("#" + field.dbName).append(
-                `<option value='${value.ValueID}'>${value.Value}</Option>`
-              );
-            });
-          } else {
-            $("#" + target).append(
-              $("#searchPanel").append(`
-          <div class='srchFieldDiv'>
-          <label for='${field.dbName}'>${field.fieldName}</label>
-          <input ID='${field.dbName}' class='srchField' Name='${field.dbName}'>
-          </Div>`)
-            );
-          }
-        } else {
-          $("#" + target).append(
-            `<div style='width:auto;float:left;'>
-                <div class="resultLabel">${field.fieldName}</div>
-                <div id="result${field.dbName}" class="field"></div>
-              </div>
-          `
-          );
-        }
-      });
+      return next(data);
     },
   });
 }
@@ -110,30 +158,6 @@ function getData(next) {
     },
     success: function (data) {
       return next(data);
-    },
-  });
-}
-
-function getFieldValue(field, fldID, next) {
-  $.ajax({
-    //http://localhost:3000/JSON/nativePlants?search={%22Species%22:%22Asclepias%22}
-    url: "/JSON/fieldValues",
-    type: "GET",
-    dataType: "JSON",
-    data: {
-      fieldID: fldID.trim(),
-      field: field,
-    },
-    error: function (error) {
-      console.log(error);
-    },
-    success: function (data) {
-      if (data && data.length > 0) {
-        $(`#li${data[0].ValueID}`).html(data[0].Value);
-      } else {
-        $(`#li${fldID.replace(/\s/g, "")}`).html(fldID);
-      }
-      return next(data[0].Value);
     },
   });
 }

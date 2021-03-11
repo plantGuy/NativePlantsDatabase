@@ -101,6 +101,7 @@ function parseValues(values, field, next) {
     }); // values loop end
 
     Promise.all(promises).then(() => {
+      client.close();
       return next(tmpValues);
     });
   });
@@ -174,7 +175,7 @@ app.get("/JSON/parseFields", (req, res) => {
               ValueID: field.ValueID.replace(/\s/g, ""),
             });
           });
-
+          client.close();
           res.send(parsedFields);
         }
         //client.close();
@@ -202,8 +203,42 @@ app.get("/JSON/fields", (req, res) => {
 
       collection.find({}).toArray((err, results) => {
         if (results) {
-          res.send(results);
           client.close();
+          res.send(results);
+        }
+      });
+      //client.close();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/JSON/normalize", (req, res) => {
+  try {
+    var newDocument = {};
+    databaseName = process.env.MongoDB;
+
+    //const uri = "mongodb+srv://PlantsAdmin:<password>@cluster0.vikvy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    client.connect((err) => {
+      const collection = client.db(process.env.MongoDB).collection("Fields");
+      // perform actions on the collection object
+
+      collection.find({}).toArray((err, results) => {
+        if (results) {
+          results.forEach((field) => {
+            if (results.values) {
+              if (results.values[0].relatedField) {
+              }
+            }
+          });
+
+          client.close();
+          res.send(results);
         }
       });
       //client.close();
@@ -237,7 +272,8 @@ app.get("/JSON/fieldValues", (req, res) => {
       console.log(search);
       collection.find(search).toArray((err, results) => {
         if (results) {
-          results[0].forEach((field) => {});
+          //results[0].forEach((field) => {});
+          client.close();
           res.send(results);
         } else {
           res.send({ Value: fieldID, ValueID: fieldID, fieldName: field });
