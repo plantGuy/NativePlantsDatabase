@@ -2,7 +2,33 @@ div {
   display: block;
 }
 
+button {
+  font-size: large;
+  padding: 8px;
+}
+
+.srchFieldDiv {
+  margin: 8px;
+}
+
+#divSubmit {
+  clear: both;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  width: 95%;
+  height: 30px;
+}
+
+#searchPanel {
+  border: 50 px;
+  background-color: lightblue;
+  padding: 50px;
+}
+
 #recordTitle {
+  clear: both;
   font-weight: bold;
   font-size: large;
   font-family: Arial, Helvetica, sans-serif;

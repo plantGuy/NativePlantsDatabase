@@ -2,14 +2,27 @@
 
 <head>
   <title>Example formated result page</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="js/template.js"></script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <link rel="stylesheet" type="text/css" href="css/formatted.css" />
 </head>
 
+<div id="searchPanel"></div>
+
+<div id="divSubmit">
+  <button id="search" onclick="getPlants()">Search</button>
+</div>
+
+<div ID='plantsList' style='display: none;'><div ID='Loading'><h1>Loading...</h1></div></div>
+
+<template ID='PNGuide'>
+  {{#each plant}}
+  <div class = 'pnREcord'>
 <div id="recordTitle">
-  <div id="species">Aquilegia canadensis</div>
-  <div id="CommonName">Wild Columbine</div>
+  <div id="species">{{strSciName.Values}}</div>
+  <div id="CommonName">{{#each strCommonName.Values}}{{Value}},{{else}}{{strCommonName.Values}}{{/each}}</div>
 </div>
 <div>
   <div class="imageDiv">
@@ -25,11 +38,11 @@
     <ul>
       <li>
         <div class="attribLabel">Height</div>
-        <div class="attrbValue">1-2 Feet</div>
+        <div class="attrbValue">{{#each strPCHeightLow.Values}}{{Value}}{{/each}}-{{#each strPCHeightHigh.Values}}{{Value}}{{/each}} Feet</div>
       </li>
       <li>
-        <div class="attribLabel">Bloom Color</div>
-        <div class="attrbValue">Red and Yellow</div>
+        <div class="attribLabel">Bloom Colors</div>
+        <div class="attrbValue">{{#each strPCFlowerColor.Values}}{{Value}}, {{else}}{{strPCFlowerColor.Values}}{{/each}}</div>
       </li>
       <li>
         <div class="attribLabel">Bloom Date</div>
@@ -54,3 +67,6 @@
     </div>
   </div>
 </div>
+</div>
+{{/each}}
+</template>

@@ -7,8 +7,10 @@ $(document).ready(() => {
 function main() {
   getFields((fields) => {
     formFields = fields;
-    displauFields("results", fields, false);
     displauFields("searchPanel", fields, true);
+
+    //displauFields("results", fields, false);
+    //displauFields("searchPanel", fields, true);
   });
   //displauFields(target, fieldlist, input = false)
 }
@@ -33,48 +35,29 @@ function getrelatedFields(fieldName) {
   }
 }
 
-function getPlants() {
-  $(".field").empty();
-  getData((data) => {
-    console.log(data);
+function getPlants(next) {
+  var search = {};
 
-    fields = $(".field"); //get the list of fields on the form
-    for (i = 0; i < fields.length; i++) {
-      let field = $(fields[i]).attr("ID").replaceAll("result", ""); //get the ID of the current field
+  $("#plantsList").css("display", "block");
 
-      if (data[field]) {
-        let values = data[field].Values; //retrieve field values
-        //console.log(values);
-        if (values) {
-          if (Array.isArray(values)) {
-            $("#result" + field).append(`<UL ID="list${field}">`);
-            makeList(values, field); // If multple values format as list
-          } else {
-            let result = `<P>${values}</p>`; //If only one value display
-            $("#result" + field).html(result);
-          }
-        }
+  var inputs = document.getElementsByClassName("srchField");
+
+  Array.prototype.forEach.call(inputs, (fld) => {
+    if (fld.value) {
+      if (isNaN(fld.value)) {
+        search[fld.id] = fld.value;
       } else {
-        //some data was spread over many fields in a wacky way... This puts it back into a normal structure
-        var relatedFields = getrelatedFields(field);
-        if (relatedFields) {
-          var values = relatedFields.filter((related) => {
-            if (data[related.relatedField]) {
-              console.log(data[related.relatedField]);
-              if (data[related.relatedField].Values.toUpperCase() == "Y") {
-                return related;
-              }
-            }
-          });
-
-          if (values) {
-            $("#result" + field).append(`<UL ID="list${field}">`);
-            makeList(values, field);
-            //normalize(values, field, data[ID]); //This ia placeholder to clean up the data
-          }
-        }
+        search[fld.id] = parseInt(fld.value);
       }
     }
+  });
+  getData(search, (data) => {
+    var template = document.getElementById("PNGuide").innerHTML;
+    var renderPlants = Handlebars.compile(template);
+    var tmpHTML = renderPlants({
+      plant: data,
+    });
+    document.getElementById("plantsList").innerHTML = tmpHTML;
   });
 }
 
@@ -133,20 +116,20 @@ function getFields(next) {
   });
 }
 
-function getData(next) {
-  var search = {};
+function getData(search, next) {
+  //var search = {};
 
-  var inputs = document.getElementsByClassName("srchField");
+  //var inputs = document.getElementsByClassName("srchField");
 
-  Array.prototype.forEach.call(inputs, (fld) => {
-    if (fld.value) {
-      if (isNaN(fld.value)) {
-        search[fld.id] = fld.value;
-      } else {
-        search[fld.id] = parseInt(fld.value);
-      }
-    }
-  });
+  // Array.prototype.forEach.call(inputs, (fld) => {
+  //   if (fld.value) {
+  //     if (isNaN(fld.value)) {
+  //       search[fld.id] = fld.value;
+  //     } else {
+  //       search[fld.id] = parseInt(fld.value);
+  //     }
+  //   }
+  // });
   console.log(search);
 
   $.ajax({
@@ -162,7 +145,7 @@ function getData(next) {
       console.log(error);
     },
     success: function (data) {
-      return next(data[0]); //only get first record
+      return next(data);
     },
   });
 }

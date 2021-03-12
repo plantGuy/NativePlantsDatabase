@@ -63,13 +63,33 @@ app.get("/JSON/nativePlants", (req, res) => {
       const collection = client.db(process.env.MongoDB).collection("Plants");
       // perform actions on the collection object
       collection.find(search).toArray(async (err, results) => {
-        if (results) {
-          getFieldValues(results[0], (newResults) => {
-            console.log(newResults);
-            res.send(newResults);
-          });
-        }
-        client.close();
+        var finalResults = [];
+        var promises = [];
+        const client2 = new MongoClient(uri, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        });
+        client2.connect((err) => {
+          if (results) {
+            results.forEach((result) => {
+              promises.push(
+                new Promise((resolve, reject) => {
+                  getFieldValues(result, client2, (newResults) => {
+                    finalResults.push(newResults);
+                    resolve();
+                  });
+                })
+              );
+            });
+            Promise.all(promises).then(() => {
+              client.close;
+              client2.close;
+              res.send(finalResults);
+            });
+          }
+        });
+
+        //client.close();
       });
     });
   } catch (error) {
@@ -77,67 +97,59 @@ app.get("/JSON/nativePlants", (req, res) => {
   }
 });
 
-function parseValues(values, field, next) {
+function parseValues(values, client, field, next) {
   var promises = [];
   var tmpValues = [];
-  const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+
   if (!Array.isArray(values)) {
     // if not an array then convert it to one.
     tmpArray = [];
     tmpArray.push(values);
     values = tmpArray;
   }
-  client.connect((err) => {
-    const collection = client.db(process.env.MongoDB).collection("FieldValues");
-    values.forEach((value) => {
-      if (!Number.isInteger) {
-        value = value.trim();
-      }
-      promises.push(
-        new Promise((resolve, reject) => {
-          var search = { fieldName: field, ValueID: value };
-          collection.find(search).toArray((err, results) => {
-            if (err) {
-              reject(err);
-            } else {
-              if (results.length > 0) {
-                tmpValues.push({
-                  Value: results[0].Value,
-                  ValueID: results[0].ValueID,
-                });
-              } else {
-                tmpValues.push({
-                  Value: value,
-                  ValueID: value,
-                });
-              }
-            }
-            resolve();
-            //client.close();
-          });
-        })
-      ); // Promise end
-    }); // values loop end
 
-    Promise.all(promises).then(() => {
-      client.close();
-      return next(tmpValues);
-    });
+  const collection = client.db(process.env.MongoDB).collection("FieldValues");
+  values.forEach((value) => {
+    if (!Number.isInteger) {
+      value = value.trim();
+    }
+    promises.push(
+      new Promise((resolve, reject) => {
+        var search = { fieldName: field, ValueID: value };
+        collection.find(search).toArray((err, results) => {
+          if (err) {
+            reject(err);
+          } else {
+            if (results.length > 0) {
+              tmpValues.push({
+                Value: results[0].Value,
+                ValueID: results[0].ValueID,
+              });
+            } else {
+              tmpValues.push({
+                Value: value,
+                ValueID: value,
+              });
+            }
+          }
+          resolve();
+          //client.close();
+        });
+      })
+    ); // Promise end
+  }); // values loop end
+
+  Promise.all(promises).then(() => {
+    //client.close();
+    return next(tmpValues);
   });
 }
 
-function getFieldValues(results, next) {
+function getFieldValues(results, client, next) {
   var parsedFields = {};
   var promises = [];
-  try {
-    const client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
 
+  try {
     if (results) {
       // perform actions on the collection object
       Object.keys(results).forEach((field) => {
@@ -152,7 +164,7 @@ function getFieldValues(results, next) {
         ) {
           promises.push(
             new Promise(async (resolve, reject) => {
-              parseValues(results[field], field, (values) => {
+              parseValues(results[field], client, field, (values) => {
                 parsedFields[field].Values = values;
                 //tmpField.values = values;
                 resolve();
