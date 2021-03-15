@@ -51,10 +51,16 @@ button {
 }
 
 .attribLabel {
-  float: left;
+  /*float: left;*/
   font-weight: bold;
   margin-right: 5px;
   text-transform: uppercase;
+  display: inline-block;
+  width: fit-content;
+}
+
+.attribValue {
+  display: inline-block;
 }
 
 .desc {
@@ -85,11 +91,10 @@ button {
   font-size: small;
 }
 
+ul {
+  /* padding-left: 30px; */
+  margin-bottom: 20px;
+}
 li {
   margin-top: 15px;
-}
-
-ul {
-  padding-left: 30px;
-  margin-bottom: 20px;
 }

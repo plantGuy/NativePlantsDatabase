@@ -52,6 +52,7 @@ function getPlants(next) {
     }
   });
   getData(search, (data) => {
+    console.log(data);
     var template = document.getElementById("PNGuide").innerHTML;
     var renderPlants = Handlebars.compile(template);
     var tmpHTML = renderPlants({

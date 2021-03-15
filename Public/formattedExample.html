@@ -29,8 +29,7 @@
     <div class="image">Image Goes here</div>
     <div class="imageFoot">
       <p>
-        Flowers attract bumblebees, butterflies, hummingbirds. Native Columbines
-        host 12 species of native caterpillars.
+        Attracts {{#each flgRUWildlife.Values}}{{Value}}, {{else}}{{flgRUWildlife}}{{/each}}
       </p>
     </div>
   </div>
@@ -38,23 +37,23 @@
     <ul>
       <li>
         <div class="attribLabel">Height</div>
-        <div class="attrbValue">{{#each strPCHeightLow.Values}}{{Value}}{{/each}}-{{#each strPCHeightHigh.Values}}{{Value}}{{/each}} Feet</div>
+        <div class="attribValue">{{#each strPCHeightLow.Values}}{{Value}}{{/each}}-{{#each strPCHeightHigh.Values}}{{Value}}{{/each}} {{#each flgPCHeightIncr.Values}}{{Value}}{{else}}{{flgPCHeightIncr.Values}}{{/each}}</div>
       </li>
       <li>
         <div class="attribLabel">Bloom Colors</div>
-        <div class="attrbValue">{{#each strPCFlowerColor.Values}}{{Value}}, {{else}}{{strPCFlowerColor.Values}}{{/each}}</div>
+        <div class="attribValue">{{#each strPCFlowerColor.Values}}{{Value}}, {{else}}{{strPCFlowerColor.Values}}{{/each}}</div>
       </li>
       <li>
-        <div class="attribLabel">Bloom Date</div>
-        <div class="attrbValue">Mar -- May</div>
+        <div class="attribLabel">Bloom Dates</div>
+        <div class="attribValue">{{#each strPCBloomTime.Values}}{{Value}}, {{else}}{{strPCBloomTime}}{{/each}}</div>
       </li>
       <li>
         <div class="attribLabel">Soil</div>
-        <div class="attrbValue">Adaptable, rocky; PH moderate-base</div>
+        <div class="attribValue">Adaptable, rocky; PH moderate-base</div>
       </li>
       <li>
         <div class="attribLabel">Natural Habitat</div>
-        <div class="attrbValue">Forests, Outcrops</div>
+        <div class="attribValue">Forests, Outcrops</div>
       </li>
       
     </ul>
